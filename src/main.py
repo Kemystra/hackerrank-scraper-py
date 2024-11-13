@@ -98,9 +98,14 @@ def login(driver):
     password_input.send_keys(PASSWORD)
 
     login_button = driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
+
+    # Crude way to wait for login button ACTUALLY load
+    # Why Selenium isn't checking that???
+    time.sleep(3)
+
     login_button.click()
 
-    # Crude way to wait for login response
+    # Yet another delay to wait for login process to complete
     time.sleep(3)
 
     return driver.get_cookies()
