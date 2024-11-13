@@ -78,7 +78,7 @@ def req_api(session: requests.Session, url: str) -> dict:
     return data
 
 
-def process_cookie(raw_cookie):
+def process_cookie(raw_cookies):
     cookies_key_value_pairs = [x for x in raw_cookies.split("; ")]
     cookies = []
     for raw_cookie_pair in cookies_key_value_pairs:
