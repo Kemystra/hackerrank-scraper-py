@@ -14,9 +14,9 @@ PASSWORD = "RugMargaritaClubhouse"
 
 CONTEST_SLUG = "cn24-prelim-test"
 CHALLENGE_LIST_ENDPOINT = "https://www.hackerrank.com/rest/contests/" + CONTEST_SLUG + "/challenges?offset=0&limit=1000000"
-CHALLENGE_SUBMISSIONS_LIST_ENDPOINT = "https://www.hackerrank.com/rest/contests/" + CONTEST_SLUG + "/judge_submissions/?offset=0&limit=1000000&challenge_id="
-
-raw_cookies = 'hackerrank_mixpanel_token=7866c454-fb22-44ef-8214-938d28d9bf8e; h_r=auth_dialog; h_l=in_app; h_v=_default; g_state={"i_p":1731488010421,"i_l":2}; hacker_editor_theme=light; user_theme=dark; hackerrankx_mixpanel_token=7866c454-fb22-44ef-8214-938d28d9bf8e; referrer=direct; metrics_user_identifier=19cf21c-0edc2bae99473f0620fda0c49b00e8b8b9a5170f; react_var=false__cnt4; react_var2=false__cnt4; _fcdscst=MTczMTUwMzE3Nzg0MQ==; show_cookie_banner=false; homepage_variant=https://www.hackerrank.com/; hrc_l_i=T; user_type=hacker; session_id=mm8vgpus-1731503199133'
+SUBMISSIONS_LIST_ENDPOINT = "https://www.hackerrank.com/rest/contests/" + CONTEST_SLUG + "/judge_submissions/?offset=0&limit=1000000"
+SUBMISSION_DATA_ENDPOINT = "https://www.hackerrank.com/rest/contests/" + CONTEST_SLUG + "/submissions/"
+ACCEPTED_SUBMISSION_STATUS = "Accepted"
 
 
 def main():
@@ -43,21 +43,37 @@ def main():
         c = {cookie["name"]: cookie["value"]}
         s.cookies.update(c)
 
-    challenge_data_list = req_api(s, CHALLENGE_LIST_ENDPOINT)["models"]
-
-    all_submission = {}
-    for challenge in challenge_data_list:
-        challenge_submissions = get_submissions(slug)
-
-
-def get_submissions(slug: str) -> list[Submission]:
+    submission_list = req_api(s, SUBMISSIONS_LIST_ENDPOINT)["models"]
+    challenge_names_map = {}
     result = []
+    for submission in submission_list:
+        if submission["status"] != ACCEPTED_SUBMISSION_STATUS:
+            continue
+
+        challenge_info = submission["challenge"]
+        challenge_names_map[challenge_info["slug"]] = challenge_info["name"]
+
+        print(submission["id"])
+        code = req_api(s, SUBMISSION_DATA_ENDPOINT + str(submission["id"]))["model"]["code"]
+
+        entry = Submission(
+            submission_id=submission["id"],
+            username=submission["hacker_username"],
+            challenge_slug=challenge_info["slug"],
+            lang=submission["language"],
+            code=code
+        )
+
+        result.append(entry)
+
+        time.sleep(5)
+
+    print(len(result))
 
 
 def req_api(session: requests.Session, url: str) -> dict:
     resp = session.get(url)
     resp.raise_for_status()
-    print(resp.status_code)
     data = json.loads(resp.text)
     return data
 

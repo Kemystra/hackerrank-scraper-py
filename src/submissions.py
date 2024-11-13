@@ -1,6 +1,11 @@
+from dataclasses import dataclass
+
+
+@dataclass
 class Submission:
-    submission_id: str
+    submission_id: int
     username: str
+    challenge_slug: str
     lang: str
     code: str
 
