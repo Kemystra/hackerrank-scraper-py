@@ -1,1 +1,3 @@
 virtual_env/
+src/__pycache__/
+res.json

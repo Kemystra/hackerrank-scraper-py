@@ -16,16 +16,20 @@ CONTEST_SLUG = "cn24-prelim-test"
 CHALLENGE_LIST_ENDPOINT = "https://www.hackerrank.com/rest/contests/" + CONTEST_SLUG + "/challenges?offset=0&limit=1000000"
 CHALLENGE_SUBMISSIONS_LIST_ENDPOINT = "https://www.hackerrank.com/rest/contests/" + CONTEST_SLUG + "/judge_submissions/?offset=0&limit=1000000&challenge_id="
 
-raw_cookies = 'hackerrank_mixpanel_token=7866c454-fb22-44ef-8214-938d28d9bf8e; h_r=auth_dialog; h_l=in_app; h_v=_default; g_state={"i_p":1731488010421,"i_l":2}; hacker_editor_theme=light; user_theme=dark; hackerrankx_mixpanel_token=7866c454-fb22-44ef-8214-938d28d9bf8e; referrer=direct; metrics_user_identifier=19cf21c-0edc2bae99473f0620fda0c49b00e8b8b9a5170f; react_var=false__cnt4; react_var2=false__cnt4; _fcdscst=MTczMTQ2MDQ2MTY5Mg==; show_cookie_banner=false; homepage_variant=https://www.hackerrank.com/; hrc_l_i=T; user_type=hacker'
+raw_cookies = 'hackerrank_mixpanel_token=7866c454-fb22-44ef-8214-938d28d9bf8e; h_r=auth_dialog; h_l=in_app; h_v=_default; g_state={"i_p":1731488010421,"i_l":2}; hacker_editor_theme=light; user_theme=dark; hackerrankx_mixpanel_token=7866c454-fb22-44ef-8214-938d28d9bf8e; referrer=direct; metrics_user_identifier=19cf21c-0edc2bae99473f0620fda0c49b00e8b8b9a5170f; react_var=false__cnt4; react_var2=false__cnt4; _fcdscst=MTczMTUwMzE3Nzg0MQ==; show_cookie_banner=false; homepage_variant=https://www.hackerrank.com/; hrc_l_i=T; user_type=hacker; session_id=mm8vgpus-1731503199133'
 
 
 def main():
-    # options = Options()
-    # # Don't wait for full page load
-    # options.page_load_strategy = 'eager'
-    # driver = webdriver.Firefox(options=options)
-    #
-    # cookies = login(driver)
+    # Copying cookies from a logged-in browser console isn't enough
+    # But fetching it directly from a Selenium session works
+    # Why?????
+
+    options = Options()
+    # Don't wait for full page load
+    options.page_load_strategy = 'eager'
+    driver = webdriver.Firefox(options=options)
+
+    cookies = login(driver)
 
     # Not sure why user agent is important here
     headers = {
@@ -34,26 +38,16 @@ def main():
     s = requests.session()
     s.headers.update(headers)
 
-    cookies_key_value_pairs = [x for x in raw_cookies.split("; ")]
-    cookies = []
-    for raw_cookie_pair in cookies_key_value_pairs:
-        pair = raw_cookie_pair.split('=')
-        c = {pair[0]: pair[1]}
-        cookies.append(c)
-
-    print(cookies)
-
     # Copying session credentials to requests for easier API calls
     for cookie in cookies:
-        s.cookies.update(cookie)
+        c = {cookie["name"]: cookie["value"]}
+        s.cookies.update(c)
 
-    data = req_api(s, CHALLENGE_LIST_ENDPOINT)
-    print(data)
-    challenge_slug_list = [x["slug"] for x in data["models"]]
-    print(challenge_slug_list)
+    challenge_data_list = req_api(s, CHALLENGE_LIST_ENDPOINT)["models"]
 
-    for slug in challenge_slug_list:
-        submission_list = get_submissions(slug)
+    all_submission = {}
+    for challenge in challenge_data_list:
+        challenge_submissions = get_submissions(slug)
 
 
 def get_submissions(slug: str) -> list[Submission]:
@@ -66,6 +60,15 @@ def req_api(session: requests.Session, url: str) -> dict:
     print(resp.status_code)
     data = json.loads(resp.text)
     return data
+
+
+def process_cookie(raw_cookie):
+    cookies_key_value_pairs = [x for x in raw_cookies.split("; ")]
+    cookies = []
+    for raw_cookie_pair in cookies_key_value_pairs:
+        pair = raw_cookie_pair.split('=')
+        c = {pair[0]: pair[1]}
+        cookies.append(c)
 
 
 def login(driver):
