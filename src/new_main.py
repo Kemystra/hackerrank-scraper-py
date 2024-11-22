@@ -39,18 +39,18 @@ def get_submission_ids(contest_name, challenge_id):
     total = response.json()['total']
     ids = []
 
-    for i in range((total + 99) // 100):
-        url = f'https://www.hackerrank.com/rest/contests/{contest_name}/judge_submissions/?offset={i * 100}&limit={100}&challenge_id={challenge_id}'
-        response = session.get(
-            url,
-            headers=headers
-        )
-        submissions = response.json()['models']
-        for j in submissions:
-            if j['status_code'] == 2:
-                ids.append(j['id'])
+    url = f'https://www.hackerrank.com/rest/contests/{contest_name}/judge_submissions/?offset=0&limit=1000000&challenge_id={challenge_id}'
+    response = session.get(
+        url,
+        headers=headers
+    )
 
-        time.sleep(1)
+    submissions = response.json()['models']
+    for j in submissions:
+        if j['status_code'] == 2:
+            ids.append(j['id'])
+
+    time.sleep(1)
 
     return ids
 
