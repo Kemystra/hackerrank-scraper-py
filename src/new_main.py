@@ -11,12 +11,11 @@ CHALLENGE_ID = "cn24-test2"
 TOKEN_NAME = "remember_hacker_token"
 
 SUBMISSION_API = "https://www.hackerrank.com/rest/contests/codenection-2024-test/submissions/"
-ACCEPTED_SUBMISSION_STATUS = "Accepted"
 
 # Pass token as argument
 token_value = sys.argv[1]
 
-delay = 5  # seconds
+DELAY = 5  # seconds
 mx_retries = 3
 
 
@@ -41,16 +40,15 @@ def get_submission_ids(CONTEST_NAME, CHALLENGE_ID, session):
 
 
 def scrape_submissions(id, session):
-    data = req_api(session, SUBMISSION_API + id)['models']
-
-    if data['status'] != ACCEPTED_SUBMISSION_STATUS:
-        return
+    data = req_api(session, SUBMISSION_API + str(id))['model']
 
     # Rename the challenge name to a safe folder name
-    folder_name = data['name'].lowercase().replace(' ', '_')
+    folder_name = data['name'].lower().replace(' ', '_')
     os.makedirs(f"./{folder_name}/", exist_ok=True)
 
     username = data['hacker_username']
+
+    print(f"Fetched {username}'s submission")
     with open(f"./{folder_name}/{username}.txt", 'w') as f:
         f.write(data['code'])
 
@@ -81,7 +79,6 @@ if __name__ == "__main__":
     submission_ids = get_submission_ids(CONTEST_NAME, CHALLENGE_ID, session)
     print(f"Scraped a total of {len(submission_ids)} submission IDs.")
 
-    print(submission_ids)
-
     for i in submission_ids:
         scrape_submissions(i, session)
+        time.sleep(DELAY)
