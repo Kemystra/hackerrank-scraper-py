@@ -1,7 +1,0 @@
-def daysinweek(current_day):
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    today = days.index(todays)
-    daysinweek = (6 - today) % 7
-    return daysinweek
-todays = input().strip()
-print(daysinweek(todays))

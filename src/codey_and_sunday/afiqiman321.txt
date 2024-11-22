@@ -1,2 +1,0 @@
-a = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
-print(7-a.index(input()))
