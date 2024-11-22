@@ -10,6 +10,8 @@ CONTEST_NAME = "codenection-2024-test"
 CHALLENGE_ID = "cn24-test2"
 TOKEN_NAME = "remember_hacker_token"
 
+SUBMISSION_API = "https://www.hackerrank.com/rest/contests/codenection-2024-test/submissions/"
+
 # Pass token as argument
 token_value = sys.argv[1]
 
@@ -25,9 +27,9 @@ def get_submission_ids(CONTEST_NAME, CHALLENGE_ID, session):
     ids = []
 
     url = f'https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/judge_submissions/?offset=0&limit=1000000&CHALLENGE_ID={CHALLENGE_ID}'
-    response = session.get(url)
+    data = req_api(session, url)
 
-    submissions = response.json()['models']
+    submissions = data['models']
     for j in submissions:
         if j['status_code'] == 2:
             ids.append(j['id'])
@@ -38,7 +40,14 @@ def get_submission_ids(CONTEST_NAME, CHALLENGE_ID, session):
 
 
 def scrape_submissions(id, session):
-    pass
+    session.get(SUBMISSION_API + str(id))
+
+
+def req_api(session: requests.Session, url: str) -> dict:
+    resp = session.get(url)
+    resp.raise_for_status()
+    data = resp.json()
+    return data
 
 
 if __name__ == "__main__":
