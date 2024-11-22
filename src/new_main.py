@@ -1,14 +1,17 @@
 import requests
 from requests.utils import cookiejar_from_dict
 import os
+import sys
 import time
 
 # Constants
 
-contest_name = "CONTEST_NAME"
-challenge_id = "CHALLENGE_SLUG"
+contest_name = "codenection-2024-test"
+challenge_id = "cn24-test2"
 token_name = "remember_hacker_token"
-token_value = "TOKEN_VALUE"
+
+# Pass token as argument
+token_value = sys.argv[1]
 delay = 5  # seconds
 mx_retries = 3
 
