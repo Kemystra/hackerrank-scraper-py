@@ -11,6 +11,7 @@ CHALLENGE_ID = "cn24-test2"
 TOKEN_NAME = "remember_hacker_token"
 
 SUBMISSION_API = "https://www.hackerrank.com/rest/contests/codenection-2024-test/submissions/"
+ACCEPTED_SUBMISSION_STATUS = "Accepted"
 
 # Pass token as argument
 token_value = sys.argv[1]
@@ -27,9 +28,9 @@ def get_submission_ids(CONTEST_NAME, CHALLENGE_ID, session):
     ids = []
 
     url = f'https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/judge_submissions/?offset=0&limit=1000000&CHALLENGE_ID={CHALLENGE_ID}'
-    data = req_api(session, url)
+    response = req_api(session, url)
 
-    submissions = data['models']
+    submissions = response['models']
     for j in submissions:
         if j['status_code'] == 2:
             ids.append(j['id'])
@@ -40,7 +41,18 @@ def get_submission_ids(CONTEST_NAME, CHALLENGE_ID, session):
 
 
 def scrape_submissions(id, session):
-    session.get(SUBMISSION_API + str(id))
+    data = req_api(session, SUBMISSION_API + id)['models']
+
+    if data['status'] != ACCEPTED_SUBMISSION_STATUS:
+        return
+
+    # Rename the challenge name to a safe folder name
+    folder_name = data['name'].lowercase().replace(' ', '_')
+    os.makedirs(f"./{folder_name}/", exist_ok=True)
+
+    username = data['hacker_username']
+    with open(f"./{folder_name}/{username}.txt", 'w') as f:
+        f.write(data['code'])
 
 
 def req_api(session: requests.Session, url: str) -> dict:
