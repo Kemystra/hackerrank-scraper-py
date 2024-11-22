@@ -6,24 +6,25 @@ import time
 
 # Constants
 
-contest_name = "codenection-2024-test"
-challenge_id = "cn24-test2"
-token_name = "remember_hacker_token"
+CONTEST_NAME = "codenection-2024-test"
+CHALLENGE_ID = "cn24-test2"
+TOKEN_NAME = "remember_hacker_token"
 
 # Pass token as argument
 token_value = sys.argv[1]
+
 delay = 5  # seconds
 mx_retries = 3
 
 
-def get_submission_ids(contest_name, challenge_id, session):
-    url = f'https://www.hackerrank.com/rest/contests/{contest_name}/judge_submissions/?offset=0&limit=1&challenge_id={challenge_id}'
+def get_submission_ids(CONTEST_NAME, CHALLENGE_ID, session):
+    url = f'https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/judge_submissions/?offset=0&limit=1&CHALLENGE_ID={CHALLENGE_ID}'
 
     response = session.get(url)
 
     ids = []
 
-    url = f'https://www.hackerrank.com/rest/contests/{contest_name}/judge_submissions/?offset=0&limit=1000000&challenge_id={challenge_id}'
+    url = f'https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/judge_submissions/?offset=0&limit=1000000&CHALLENGE_ID={CHALLENGE_ID}'
     response = session.get(url)
 
     submissions = response.json()['models']
@@ -44,7 +45,7 @@ if __name__ == "__main__":
     session = requests.session()
 
     cookies = dict({
-        token_name: token_value
+        TOKEN_NAME: token_value
     })
 
     cookies = cookiejar_from_dict(cookies)
@@ -56,7 +57,7 @@ if __name__ == "__main__":
     }
 
     session.headers.update(headers)
-    submission_ids = get_submission_ids(contest_name, challenge_id, session)
+    submission_ids = get_submission_ids(CONTEST_NAME, CHALLENGE_ID, session)
     print(f"Scraped a total of {len(submission_ids)} submission IDs.")
 
     print(submission_ids)
