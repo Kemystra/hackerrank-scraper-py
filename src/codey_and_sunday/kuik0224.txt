@@ -1,0 +1,21 @@
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
+        Scanner input = new Scanner(System.in);
+        String s = input.nextLine().toUpperCase();
+        String [] sArray = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
+        for(int i=0; i<sArray.length; i++) {
+            if(sArray[i].equals(s)){
+                System.out.println((sArray.length-1) - i);
+                break;
+            }
+        }
+    }
+}

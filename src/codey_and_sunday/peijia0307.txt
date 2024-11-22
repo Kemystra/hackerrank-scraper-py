@@ -1,0 +1,14 @@
+def days_until_sunday(day):
+    week={
+        "Monday":0,
+        "Tuesday":1,
+        "Wednesday":2,
+        "Thursday":3,
+        "Firday":4,
+        "Saturday":5,
+        "Sunday":6,
+    }
+    return 6 -week[day]
+
+day=input()
+print(days_until_sunday(day))

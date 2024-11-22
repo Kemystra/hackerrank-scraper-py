@@ -1,0 +1,44 @@
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+       Scanner input = new Scanner(System.in);
+        int days = 0;
+        String s = input.next();
+        switch(s){
+            case "Sunday":
+                days = 7;
+                System.out.println(days);
+        break;
+            case "Monday":
+                days = 6;
+                System.out.println(days);
+        break;
+        case "Tuesday":
+                days = 5;
+                System.out.println(days);
+        break;
+                case "Wednesday":
+                days = 4;
+                System.out.println(days);
+        break;
+        case "Thursday":
+                days = 3;
+                System.out.println(days);
+        break;
+        case "Friday":
+                days = 2;
+                System.out.println(days);
+        break;
+        case "Saturday":
+                days = 1;
+                System.out.println(days);
+        break;
+        }
+    }
+}

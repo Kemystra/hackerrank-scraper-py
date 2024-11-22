@@ -1,0 +1,47 @@
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+    
+    public static void main(String[] args) {
+        int Sunday=7;
+        int days=0;
+        Scanner scan=new Scanner(System.in);
+        String day=scan.nextLine();
+        switch(day){
+        case "Monday":
+         days=1;
+                break;
+        case "Tuesday":
+         days=2;
+                break;
+
+        case "Wednesday":
+         days=3;
+                break;
+
+        case "Thursday":
+        days=4;
+                break;
+
+        case "Friday":
+        days=5;
+                break;
+            case "Saturday":
+        days=6;
+        break;
+        case "Sunday":
+        days=7;
+        break;
+        default:
+        System.out.println("Please Enter Correct Name of Day >>");
+            break;
+        }
+        System.out.println((Sunday-days));
+
+        
+    }
+}

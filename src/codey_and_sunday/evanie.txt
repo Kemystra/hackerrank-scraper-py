@@ -1,0 +1,12 @@
+day = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+count = [6,5,4,3,2,1,0]
+res = 0
+s = input()
+
+for i in range(6):
+    if day[i] == s:
+        res = count[i]
+        break
+
+print(res)
+    

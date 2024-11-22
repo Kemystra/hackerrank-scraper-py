@@ -1,0 +1,26 @@
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
+        String s;
+        Scanner sc = new Scanner(System.in);
+        s = sc.nextLine();
+        int n=7;
+        switch (s){
+            case "Monday": System.out.print(n-1);break;
+            case "Tuesday": System.out.print(n-2);break;
+            case "Wednesday": System.out.print(n-3);break;
+            case "Thursday": System.out.print(n-4);break;
+            case "Friday": System.out.print(n-5);break;
+            case "Saturday": System.out.print(n-6);break;
+            case "Sunday": System.out.print(n-7);break;
+            default: System.out.println("Invalid input");
+        }
+    }
+}

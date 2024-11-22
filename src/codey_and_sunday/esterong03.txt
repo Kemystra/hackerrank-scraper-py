@@ -1,0 +1,21 @@
+# Enter your code here. Read input from STDIN. Print output to STDOUT
+# Read input from STDIN
+import sys
+s = sys.stdin.read()
+
+day_number = {
+    "monday": 1,
+    "tuesday": 2,
+    "wednesday": 3,
+    "thursday": 4,
+    "friday": 5,
+    "saturday": 6
+}
+
+s = s.lower()
+if s == "monday" or "tuesday" or "wednesday" or "thursday" or "friday" or "saturday":
+    number = day_number[s.strip()]
+    days_to_sunday = 7-number
+    print(days_to_sunday)
+else:
+    print("Input should only be monday to saturday")

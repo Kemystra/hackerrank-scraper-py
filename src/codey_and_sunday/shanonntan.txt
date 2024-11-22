@@ -1,0 +1,47 @@
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+
+int main() {
+    /* Enter your code here. Read input from STDIN. Print output to STDOUT */   
+    string s;
+    int days;
+    cin>>s;
+    if(s=="Monday"){
+        days=6;
+    }
+    else{
+        if(s=="Tuesday"){
+            days=5;
+        }
+        else{
+            if(s=="Wednesday"){
+                days=4;
+            }
+            else{
+                if(s=="Thursday"){
+                    days=3;
+                }
+                else{
+                    if(s=="Friday"){
+                        days=2;
+                    }
+                    else{
+                        if(s=="Saturday"){
+                            days=1;
+                        }
+                        else{
+                            days=7;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    cout<<days;
+    return 0;
+}

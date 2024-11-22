@@ -1,0 +1,24 @@
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <unordered_map>
+using namespace std;
+
+
+int main() {
+    std::unordered_map<string, int> dict;
+    dict["Monday"] = 6;
+    dict["Tuesday"] = 5;
+    dict["Wednesday"] = 4;
+    dict["Thursday"] = 3;
+    dict["Friday"] = 2;
+    dict["Saturday"] = 1;
+    
+    std::string day;
+    std::cin >> day;
+    
+    std::cout << dict[day];   
+    return 0;
+}

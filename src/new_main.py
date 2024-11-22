@@ -3,6 +3,7 @@ from requests.utils import cookiejar_from_dict
 import os
 import sys
 import time
+import random
 
 # Constants
 
@@ -20,13 +21,9 @@ mx_retries = 3
 
 
 def get_submission_ids(CONTEST_NAME, CHALLENGE_ID, session):
-    url = f'https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/judge_submissions/?offset=0&limit=1&CHALLENGE_ID={CHALLENGE_ID}'
-
-    response = session.get(url)
-
     ids = []
 
-    url = f'https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/judge_submissions/?offset=0&limit=1000000&CHALLENGE_ID={CHALLENGE_ID}'
+    url = f'https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/judge_submissions/?offset=0&limit=1000000&challenge_id={CHALLENGE_ID}'
     response = req_api(session, url)
 
     submissions = response['models']
@@ -81,4 +78,4 @@ if __name__ == "__main__":
 
     for i in submission_ids:
         scrape_submissions(i, session)
-        time.sleep(DELAY)
+        time.sleep(DELAY + random.random())

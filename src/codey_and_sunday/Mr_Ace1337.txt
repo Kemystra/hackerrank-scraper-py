@@ -1,0 +1,32 @@
+import java.util.Scanner;
+
+public class DaysUntilSunday {
+    public static void main(String[] args) {
+        // Create a scanner object to take input
+        Scanner scanner = new Scanner(System.in);
+
+        // Read the current day from input
+        String currentDay = scanner.nextLine();
+
+        // Map the days to their positions
+        int dayNumber;
+        switch (currentDay) {
+            case "Monday" -> dayNumber = 0;
+            case "Tuesday" -> dayNumber = 1;
+            case "Wednesday" -> dayNumber = 2;
+            case "Thursday" -> dayNumber = 3;
+            case "Friday" -> dayNumber = 4;
+            case "Saturday" -> dayNumber = 5;
+            default -> throw new IllegalArgumentException("Invalid day input");
+        }
+
+        // Sunday is position 6
+        int sundayPosition = 6;
+
+        // Calculate days until Sunday
+        int daysUntilSunday = sundayPosition - dayNumber;
+
+        // Output the result
+        System.out.println(daysUntilSunday);
+    }
+}

@@ -1,0 +1,26 @@
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <string>
+using namespace std;
+
+
+int main() {
+    string array[6] = {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};//ouehra
+    string day;
+    cin >> day;
+    int result = 0;
+    for (string days: array){
+        if (day == days){
+            break;
+        }
+        result += 1;
+    }
+    result = 6 - result; 
+    cout << result;
+    
+    /* Enter your code here. Read input from STDIN. Print output to STDOUT */   
+    return 0;
+}
