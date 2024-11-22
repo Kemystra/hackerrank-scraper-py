@@ -1,115 +1,86 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options
-
-from submissions import Submission
-
 import requests
+from requests.utils import cookiejar_from_dict
+import os
+import sys
 import time
-import json
+import random
 
-LOGIN_URL = "https://www.hackerrank.com/auth/login"
-USERNAME = "programmer_cole1"
-PASSWORD = "RugMargaritaClubhouse"
+# Constants
 
-CONTEST_SLUG = "cn24-prelim-test"
-CHALLENGE_LIST_ENDPOINT = "https://www.hackerrank.com/rest/contests/" + CONTEST_SLUG + "/challenges?offset=0&limit=1000000"
-SUBMISSIONS_LIST_ENDPOINT = "https://www.hackerrank.com/rest/contests/" + CONTEST_SLUG + "/judge_submissions/?offset=0&limit=1000000"
-SUBMISSION_DATA_ENDPOINT = "https://www.hackerrank.com/rest/contests/" + CONTEST_SLUG + "/submissions/"
-ACCEPTED_SUBMISSION_STATUS = "Accepted"
+CONTEST_NAME = "codenection-2024-test"
+TOKEN_NAME = "remember_hacker_token"
+
+SUBMISSION_API = "https://www.hackerrank.com/rest/contests/codenection-2024-test/submissions/"
+
+# Pass token as argument
+token_value = sys.argv[1]
+challenge_id = sys.argv[2]
+
+DELAY = 5  # seconds
+mx_retries = 3
 
 
-def main():
-    # Copying cookies from a logged-in browser console isn't enough
-    # But fetching it directly from a Selenium session works
-    # Why?????
+def get_submission_ids(CONTEST_NAME, challenge_id, session):
+    ids = []
 
-    options = Options()
-    # Don't wait for full page load
-    options.page_load_strategy = 'eager'
-    driver = webdriver.Firefox(options=options)
+    url = f'https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/judge_submissions/?offset=0&limit=1000000&challenge_id={challenge_id}'
+    response = req_api(session, url)
 
-    cookies = login(driver)
+    submissions = response['models']
+    for j in submissions:
+        if j['status_code'] == 2:
+            ids.append(j['id'])
 
-    # Not sure why user agent is important here
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36"
-    }
-    s = requests.session()
-    s.headers.update(headers)
+    time.sleep(1)
 
-    # Copying session credentials to requests for easier API calls
-    for cookie in cookies:
-        c = {cookie["name"]: cookie["value"]}
-        s.cookies.update(c)
+    return ids
 
-    submission_list = req_api(s, SUBMISSIONS_LIST_ENDPOINT)["models"]
-    challenge_names_map = {}
-    result = []
-    for submission in submission_list:
-        if submission["status"] != ACCEPTED_SUBMISSION_STATUS:
-            continue
 
-        challenge_info = submission["challenge"]
-        challenge_names_map[challenge_info["slug"]] = challenge_info["name"]
+def scrape_submissions(id, session):
+    data = req_api(session, SUBMISSION_API + str(id))['model']
 
-        print(submission["id"])
-        code = req_api(s, SUBMISSION_DATA_ENDPOINT + str(submission["id"]))["model"]["code"]
+    # Rename the challenge name to a safe folder name
+    folder_name = data['name'].lower().replace(' ', '_')
+    os.makedirs(f"./{folder_name}/", exist_ok=True)
 
-        entry = Submission(
-            submission_id=submission["id"],
-            username=submission["hacker_username"],
-            challenge_slug=challenge_info["slug"],
-            lang=submission["language"],
-            code=code
-        )
+    username = data['hacker_username']
 
-        result.append(entry)
-
-        time.sleep(5)
-
-    print(len(result))
+    print(f"Fetched {username}'s submission")
+    with open(f"./{folder_name}/{username}.txt", 'w') as f:
+        f.write(data['code'])
 
 
 def req_api(session: requests.Session, url: str) -> dict:
     resp = session.get(url)
     resp.raise_for_status()
-    data = json.loads(resp.text)
+    data = resp.json()
     return data
 
 
-def process_cookie(raw_cookies):
-    cookies_key_value_pairs = [x for x in raw_cookies.split("; ")]
-    cookies = []
-    for raw_cookie_pair in cookies_key_value_pairs:
-        pair = raw_cookie_pair.split('=')
-        c = {pair[0]: pair[1]}
-        cookies.append(c)
-
-
-def login(driver):
-    driver.get(LOGIN_URL)
-    inputs = driver.find_elements(By.TAG_NAME, "input")
-
-    username_input = inputs[0]
-    password_input = inputs[1]
-
-    username_input.send_keys(USERNAME)
-    password_input.send_keys(PASSWORD)
-
-    login_button = driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
-
-    # Crude way to wait for login button ACTUALLY load
-    # Why Selenium isn't checking that???
-    time.sleep(3)
-
-    login_button.click()
-
-    # Yet another delay to wait for login process to complete
-    time.sleep(3)
-
-    return driver.get_cookies()
-
-
 if __name__ == "__main__":
-    main()
+    session = requests.session()
+
+    cookies = dict({
+        TOKEN_NAME: token_value
+    })
+
+    cookies = cookiejar_from_dict(cookies)
+    session.cookies.update(cookies)
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Content-Type': 'application/json'
+    }
+
+    session.headers.update(headers)
+    submission_ids = get_submission_ids(CONTEST_NAME, challenge_id, session)
+    print(f"Scraped a total of {len(submission_ids)} submission IDs.")
+
+    for i in submission_ids:
+        while True:
+            try:
+                scrape_submissions(i, session)
+            except Exception:
+                continue
+            time.sleep(DELAY + random.random())
+            break
