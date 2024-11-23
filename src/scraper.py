@@ -38,7 +38,7 @@ def scrape(args):
     print(f"Scraped a total of {len(submission_ids)} submission IDs.")
 
     for i in submission_ids:
-        fetch_submissions_with_retries(context, id)
+        fetch_submissions_with_retries(context, i)
 
 
 def get_submission_ids(context, challenge_id):
@@ -57,11 +57,11 @@ def get_submission_ids(context, challenge_id):
     return ids
 
 
-def fetch_submissions_with_retries(context, id):
+def fetch_submissions_with_retries(context, sub_id):
     # Retry each submission, in case of HTTP code 429: Too many requests
     while True:
         try:
-            scrape_submissions(context, id)
+            scrape_submissions(context, sub_id)
         except requests.exceptions.HTTPError as err:
             if err.response.status_code == 429:
                 continue
