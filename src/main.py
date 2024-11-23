@@ -7,10 +7,10 @@ import random
 
 # Constants
 
-CONTEST_NAME = "codenection-2024-test"
+CONTEST_NAME = "codenection-2023-preliminary-round-open-category"
 TOKEN_NAME = "remember_hacker_token"
 
-SUBMISSION_API = "https://www.hackerrank.com/rest/contests/codenection-2024-test/submissions/"
+SUBMISSION_API = "https://www.hackerrank.com/rest/contests/"+CONTEST_NAME+"/submissions/"
 
 # Pass token as argument
 token_value = sys.argv[1]
@@ -18,6 +18,35 @@ challenge_id = sys.argv[2]
 
 DELAY = 5  # seconds
 mx_retries = 3
+
+
+def main():
+    session = requests.session()
+
+    cookies = dict({
+        TOKEN_NAME: token_value
+    })
+
+    cookies = cookiejar_from_dict(cookies)
+    session.cookies.update(cookies)
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Content-Type': 'application/json'
+    }
+
+    session.headers.update(headers)
+    submission_ids = get_submission_ids(CONTEST_NAME, challenge_id, session)
+    print(f"Scraped a total of {len(submission_ids)} submission IDs.")
+
+    for i in submission_ids:
+        while True:
+            try:
+                scrape_submissions(i, session)
+            except Exception:
+                continue
+            time.sleep(DELAY + random.random())
+            break
 
 
 def get_submission_ids(CONTEST_NAME, challenge_id, session):
@@ -58,29 +87,4 @@ def req_api(session: requests.Session, url: str) -> dict:
 
 
 if __name__ == "__main__":
-    session = requests.session()
-
-    cookies = dict({
-        TOKEN_NAME: token_value
-    })
-
-    cookies = cookiejar_from_dict(cookies)
-    session.cookies.update(cookies)
-
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-        'Content-Type': 'application/json'
-    }
-
-    session.headers.update(headers)
-    submission_ids = get_submission_ids(CONTEST_NAME, challenge_id, session)
-    print(f"Scraped a total of {len(submission_ids)} submission IDs.")
-
-    for i in submission_ids:
-        while True:
-            try:
-                scrape_submissions(i, session)
-            except Exception:
-                continue
-            time.sleep(DELAY + random.random())
-            break
+    main()
