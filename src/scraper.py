@@ -18,7 +18,7 @@ DELAY = 5  # seconds
 mx_retries = 3
 
 
-def main():
+def scrape():
     session = requests.session()
 
     cookies = dict({
@@ -82,7 +82,3 @@ def req_api(session: requests.Session, url: str) -> dict:
     resp.raise_for_status()
     data = resp.json()
     return data
-
-
-if __name__ == "__main__":
-    main()
