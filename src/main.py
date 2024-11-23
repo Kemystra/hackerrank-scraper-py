@@ -10,8 +10,6 @@ import random
 CONTEST_NAME = "codenection-2023-preliminary-round-open-category"
 TOKEN_NAME = "remember_hacker_token"
 
-SUBMISSION_API = "https://www.hackerrank.com/rest/contests/"+CONTEST_NAME+"/submissions/"
-
 # Pass token as argument
 token_value = sys.argv[1]
 challenge_id = sys.argv[2]
@@ -66,7 +64,7 @@ def get_submission_ids(CONTEST_NAME, challenge_id, session):
 
 
 def scrape_submissions(id, session):
-    data = req_api(session, SUBMISSION_API + str(id))['model']
+    data = req_api(session, f"https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/submissions/{id}")['model']
 
     # Rename the challenge name to a safe folder name
     folder_name = data['name'].lower().replace(' ', '_')
