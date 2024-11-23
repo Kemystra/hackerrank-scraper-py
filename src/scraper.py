@@ -1,28 +1,25 @@
 import requests
 from requests.utils import cookiejar_from_dict
 import os
-import sys
 import time
 import random
+from dataclasses import dataclass
 
 # Constants
-
-CONTEST_NAME = "codenection-2023-preliminary-round-open-category"
 TOKEN_NAME = "remember_hacker_token"
 
-# Pass token as argument
-token_value = sys.argv[1]
-challenge_id = sys.argv[2]
 
-DELAY = 5  # seconds
-mx_retries = 3
+@dataclass
+class Context:
+    session: requests.Session
+    contest_name: str
 
 
 def scrape(args):
     session = requests.session()
 
     cookies = dict({
-        TOKEN_NAME: token_value
+        TOKEN_NAME: args.token
     })
 
     cookies = cookiejar_from_dict(cookies)
@@ -34,24 +31,26 @@ def scrape(args):
     }
 
     session.headers.update(headers)
-    submission_ids = get_submission_ids(CONTEST_NAME, challenge_id, session)
+
+    context = Context(session, args.contest_name)
+    submission_ids = get_submission_ids(context, args.challenge_id)
     print(f"Scraped a total of {len(submission_ids)} submission IDs.")
 
     for i in submission_ids:
         while True:
             try:
-                scrape_submissions(i, session)
+                scrape_submissions(context, i)
             except Exception:
                 continue
-            time.sleep(DELAY + random.random())
+            time.sleep(args.delay + random.random())
             break
 
 
-def get_submission_ids(CONTEST_NAME, challenge_id, session):
+def get_submission_ids(context, challenge_id):
     ids = []
 
-    url = f'https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/judge_submissions/?offset=0&limit=1000000&challenge_id={challenge_id}'
-    response = req_api(session, url)
+    url = f'https://www.hackerrank.com/rest/contests/{context.contest_name}/judge_submissions/?offset=0&limit=1000000&challenge_id={challenge_id}'
+    response = req_api(context.session, url)
 
     submissions = response['models']
     for j in submissions:
@@ -63,8 +62,9 @@ def get_submission_ids(CONTEST_NAME, challenge_id, session):
     return ids
 
 
-def scrape_submissions(id, session):
-    data = req_api(session, f"https://www.hackerrank.com/rest/contests/{CONTEST_NAME}/submissions/{id}")['model']
+def scrape_submissions(context, id):
+    url = f"https://www.hackerrank.com/rest/contests/{context.contest_name}/submissions/{id}"
+    data = req_api(context.session, url)['model']
 
     # Rename the challenge name to a safe folder name
     folder_name = data['name'].lower().replace(' ', '_')
