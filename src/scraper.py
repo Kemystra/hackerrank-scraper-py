@@ -13,6 +13,7 @@ TOKEN_NAME = "remember_hacker_token"
 class Context:
     session: requests.Session
     contest_name: str
+    delay: float
 
 
 def scrape(args):
@@ -32,18 +33,12 @@ def scrape(args):
 
     session.headers.update(headers)
 
-    context = Context(session, args.contest_name)
+    context = Context(session, args.contest_name, args.delay)
     submission_ids = get_submission_ids(context, args.challenge_id)
     print(f"Scraped a total of {len(submission_ids)} submission IDs.")
 
     for i in submission_ids:
-        while True:
-            try:
-                scrape_submissions(context, i)
-            except Exception:
-                continue
-            time.sleep(args.delay + random.random())
-            break
+        fetch_submissions_with_retries(context, id)
 
 
 def get_submission_ids(context, challenge_id):
@@ -60,6 +55,21 @@ def get_submission_ids(context, challenge_id):
     time.sleep(1)
 
     return ids
+
+
+def fetch_submissions_with_retries(context, id):
+    # Retry each submission, in case of HTTP code 429: Too many requests
+    while True:
+        try:
+            scrape_submissions(context, id)
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 429:
+                continue
+            else:
+                raise err
+        # Jitter to try confusing the rate limiter
+        time.sleep(context.delay + random.random())
+        break
 
 
 def scrape_submissions(context, id):
