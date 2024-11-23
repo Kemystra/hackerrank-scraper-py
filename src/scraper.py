@@ -75,8 +75,8 @@ def fetch_submissions_with_retries(context, sub_id):
         break
 
 
-def scrape_submissions(context, id):
-    url = f"https://www.hackerrank.com/rest/contests/{context.contest_name}/submissions/{id}"
+def scrape_submissions(context, sub_id):
+    url = f"https://www.hackerrank.com/rest/contests/{context.contest_name}/submissions/{sub_id}"
     data = req_api(context.session, url)['model']
 
     # Rename the challenge name to a safe folder name
