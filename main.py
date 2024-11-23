@@ -6,12 +6,12 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Required arguments
-    parser.add_argument('-t', '--token', type=str, required=True, help='Token input')
-    parser.add_argument('-cn', '--contest_name', type=str, required=True, help='Contest name input')
-    parser.add_argument('-cid', '--challenge_id', type=str, required=True, help='Challenge ID input')
+    parser.add_argument('-t', '--token', type=str, required=True, help='Token for authentication')
+    parser.add_argument('-cn', '--contest_name', type=str, required=True, help='Contest name')
+    parser.add_argument('-cid', '--challenge_id', type=str, required=True, help='Challenge ID', default=5)
 
     # Optional argument
-    parser.add_argument('-d', '--delay', type=float, help='Delay input')
+    parser.add_argument('-d', '--delay', type=float, help='Delay between requests, in seconds')
 
     args = parser.parse_args()
     scraper.scrape(args)
