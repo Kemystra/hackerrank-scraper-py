@@ -18,7 +18,7 @@ DELAY = 5  # seconds
 mx_retries = 3
 
 
-def scrape():
+def scrape(args):
     session = requests.session()
 
     cookies = dict({
