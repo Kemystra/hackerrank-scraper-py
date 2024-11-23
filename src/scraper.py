@@ -35,10 +35,13 @@ def scrape(args):
 
     context = Context(session, args.contest_name, args.delay)
     submission_ids = get_submission_ids(context, args.challenge_id)
-    print(f"Scraped a total of {len(submission_ids)} submission IDs.")
+    total_submissions = len(submission_ids)
+    print(f"Scraped a total of {total_submissions} submission IDs.")
 
-    for i in submission_ids:
-        fetch_submissions_with_retries(context, i)
+    for i in range(total_submissions):
+        progress_percent = (i / total_submissions) * 100
+        print(f"{progress_percent:.4f}% - ", end='')
+        fetch_submissions_with_retries(context, submission_ids[i])
 
 
 def get_submission_ids(context, challenge_id):
