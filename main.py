@@ -11,7 +11,7 @@ def main():
     parser.add_argument('-cid', '--challenge_id', type=str, required=True, help='Challenge ID', default=5)
 
     # Optional argument
-    parser.add_argument('-d', '--delay', type=float, help='Delay between requests, in seconds')
+    parser.add_argument('-d', '--delay', type=float, help='Delay between requests, in seconds. Default is 5 seconds')
 
     args = parser.parse_args()
     scraper.scrape(args)
