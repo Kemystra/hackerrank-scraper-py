@@ -17,7 +17,7 @@ python main.py -f OPTION_FILE
 
 ```
 
-The format of the option file is:
+The basic format of the option file is:
 ```json
 {
     "token": "TOKEN",
