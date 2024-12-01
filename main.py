@@ -12,6 +12,9 @@ def main():
 
     # Optional argument
     parser.add_argument('-d', '--delay', type=float, help='Delay between requests, in seconds. Default is 5 seconds', default=5)
+    parser.add_argument('--accepted-only', action='store_true', default=False, dest='is_accepted_only')
+    parser.add_argument('-u', '--username', type=str, default='', dest='usernames')
+    parser.add_argument('-o', '--output-folder', type=str, default='', dest='output_folder')
 
     args = parser.parse_args()
     scraper.scrape(args)

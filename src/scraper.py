@@ -7,20 +7,29 @@ from dataclasses import dataclass
 
 # Constants
 TOKEN_NAME = "remember_hacker_token"
+ACCEPTED_STATUS = "Accepted"
+WRONG_ANSWER_STATUS = "Wrong Answer"
 
 
 @dataclass
 class Context:
     session: requests.Session
     contest_name: str
-    delay: float
 
 
 def scrape(args):
     session = requests.session()
 
+    token_value = ""
+    if ".txt" in args.token:
+        f = open(args.token)
+        token_value = f.read()
+        f.close()
+    else:
+        token_value = args.token
+
     cookies = dict({
-        TOKEN_NAME: args.token
+        TOKEN_NAME: token_value
     })
 
     cookies = cookiejar_from_dict(cookies)
@@ -34,48 +43,55 @@ def scrape(args):
     session.headers.update(headers)
 
     context = Context(session, args.contest_name, args.delay)
-    submission_ids = get_submission_ids(context, args.challenge_id)
+    submission_ids = get_submission_ids(context, args.challenge_id, args.is_accepted_only, args.usernames)
     total_submissions = len(submission_ids)
     print(f"Scraped a total of {total_submissions} submission IDs.")
 
     for i in range(total_submissions):
         progress_percent = (i / total_submissions) * 100
         print(f"{progress_percent:.4f}% - ", end='')
-        fetch_submissions_with_retries(context, submission_ids[i])
+        fetch_submissions_with_retries(context, submission_ids[i], args.delay, args.output_folder)
 
 
-def get_submission_ids(context, challenge_id):
+def get_submission_ids(context, challenge_id_csv, is_accepted_only, usernames):
     ids = []
 
-    url = f'https://www.hackerrank.com/rest/contests/{context.contest_name}/judge_submissions/?offset=0&limit=1000000&challenge_id={challenge_id}'
-    response = req_api(context.session, url)
+    challenge_id_array = challenge_id_csv.strip().split(',')
+    username_array = usernames.strip().split(',')
 
-    submissions = response['models']
-    for j in submissions:
-        if j['status_code'] == 2:
+    for challenge_id in challenge_id_array:
+        url = f'https://www.hackerrank.com/rest/contests/{context.contest_name}/judge_submissions/?offset=0&limit=1000000&challenge_id={challenge_id}'
+        response = req_api(context.session, url)
+
+        submissions = response['models']
+        for j in submissions:
+            if is_accepted_only and j['status'] != ACCEPTED_STATUS:
+                continue
+            if username_array and submissions['hacker_username'] not in username_array:
+                continue
             ids.append(j['id'])
 
-    time.sleep(1)
+        time.sleep(1)
 
     return ids
 
 
-def fetch_submissions_with_retries(context, sub_id):
+def fetch_submissions_with_retries(context, sub_id, delay, output_folder):
     # Retry each submission, in case of HTTP code 429: Too many requests
     while True:
         try:
-            scrape_submissions(context, sub_id)
+            scrape_submissions(context, sub_id, output_folder)
         except requests.exceptions.HTTPError as err:
             if err.response.status_code == 429:
                 continue
             else:
                 raise err
         # Jitter to try confusing the rate limiter
-        time.sleep(context.delay + random.random())
+        time.sleep(delay + random.random())
         break
 
 
-def scrape_submissions(context, sub_id):
+def scrape_submissions(context, sub_id, output_folder):
     url = f"https://www.hackerrank.com/rest/contests/{context.contest_name}/submissions/{sub_id}"
     data = req_api(context.session, url)['model']
 
@@ -84,9 +100,15 @@ def scrape_submissions(context, sub_id):
     os.makedirs(f"./{folder_name}/", exist_ok=True)
 
     username = data['hacker_username']
+    time_str = time.strftime("%H:%M:%S", data['created_at_epoch'])
+
+    if not output_folder:
+        submission_filename = f"./{folder_name}/{username}_{time_str}.txt"
+    else:
+        submission_filename = f"./{output_folder}/{folder_name}/{username}_{time_str}.txt"
 
     print(f"Fetched {username}'s submission")
-    with open(f"./{folder_name}/{username}.txt", 'w') as f:
+    with open(submission_filename, 'w') as f:
         f.write(data['code'])
 
 
