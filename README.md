@@ -24,7 +24,8 @@ The format of the option file is:
     "contest_name": "CONTEST_NAME",
     "challenge_id": [],
     "output_folder": "OUTPUT_FOLDER",
-    "usernames": []
+    "usernames": [],
+    "delay": DELAY
 }
 ```
 
