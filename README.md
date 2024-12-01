@@ -35,4 +35,4 @@ The basic format of the option file is:
 
 - Without the option `-u,--username`, the program will fetch submissions from ALL username.
 
-- Without the option `-cid,--challenge-id`, s
+- Without the option `-cid,--challenge-id`, the program will fetch submission from ALL challenges in the contest.
