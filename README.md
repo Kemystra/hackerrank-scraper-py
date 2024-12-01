@@ -20,7 +20,7 @@ python main.py -f OPTION_FILE
 The format of the option file is:
 ```json
 {
-    "token": "TOKEN"
+    "token": "TOKEN",
     "contest_name": "CONTEST_NAME",
     "challenge_id": [],
     "output_folder": "OUTPUT_FOLDER",
