@@ -101,7 +101,7 @@ def scrape_submissions(context, sub_id, output_folder):
     os.makedirs(f"./{output_folder}/{folder_name}/", exist_ok=True)
 
     username = data['hacker_username']
-    time_str = time.strftime("%H-%M-%S", time.gmtime(int(data['created_at_epoch'])))
+    time_str = time.strftime("%H-%M-%S", time.localtime(int(data['created_at_epoch'])))
 
     if not output_folder:
         submission_filename = f"./{folder_name}/{username}_{time_str}.txt"
