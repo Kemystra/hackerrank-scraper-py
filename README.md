@@ -22,12 +22,17 @@ The basic format of the option file is:
 {
     "token": "TOKEN",
     "contest_name": "CONTEST_NAME",
-    "challenge_id": [],
-    "output_folder": "OUTPUT_FOLDER",
+    "challenge_ids": [],
     "usernames": [],
-    "delay": DELAY
+    "output_folder": "OUTPUT_FOLDER",
+    "delay": 3,
+    "is_accepted_only": false
 }
 ```
 
 ## Advanced
-An optional `-d,--delay` option can be given, with no. of seconds as input. This will set the delay between each submission's fetching requests. Note that setting this number too low may have unexpected consequences. By default, it is set to 5 seconds.
+- An optional `-d,--delay` option can be given, with no. of seconds as input. This will set the delay between each submission's fetching requests. Note that setting this number too low may have unexpected consequences. By default, it is set to 5 seconds.
+
+- Without the option `-u,--username`, the program will fetch submissions from ALL username.
+
+- Without the option `-cid,--challenge-id`, s
