@@ -24,6 +24,7 @@ def scrape(args):
     if ".txt" in args.token:
         f = open(args.token)
         token_value = f.read()
+        token_value = token_value.strip()
         f.close()
     else:
         token_value = args.token
@@ -42,13 +43,13 @@ def scrape(args):
 
     session.headers.update(headers)
 
-    context = Context(session, args.contest_name, args.delay)
+    context = Context(session, args.contest_name)
     submission_ids = get_submission_ids(context, args.challenge_id, args.is_accepted_only, args.usernames)
     total_submissions = len(submission_ids)
     print(f"Scraped a total of {total_submissions} submission IDs.")
 
     for i in range(total_submissions):
-        progress_percent = (i / total_submissions) * 100
+        progress_percent = ((i+1) / total_submissions) * 100
         print(f"{progress_percent:.4f}% - ", end='')
         fetch_submissions_with_retries(context, submission_ids[i], args.delay, args.output_folder)
 
@@ -67,7 +68,7 @@ def get_submission_ids(context, challenge_id_csv, is_accepted_only, usernames):
         for j in submissions:
             if is_accepted_only and j['status'] != ACCEPTED_STATUS:
                 continue
-            if username_array and submissions['hacker_username'] not in username_array:
+            if username_array and j['hacker_username'] not in username_array:
                 continue
             ids.append(j['id'])
 
@@ -97,10 +98,10 @@ def scrape_submissions(context, sub_id, output_folder):
 
     # Rename the challenge name to a safe folder name
     folder_name = data['name'].lower().replace(' ', '_')
-    os.makedirs(f"./{folder_name}/", exist_ok=True)
+    os.makedirs(f"./{output_folder}/{folder_name}/", exist_ok=True)
 
     username = data['hacker_username']
-    time_str = time.strftime("%H:%M:%S", data['created_at_epoch'])
+    time_str = time.strftime("%H-%M-%S", time.gmtime(int(data['created_at_epoch'])))
 
     if not output_folder:
         submission_filename = f"./{folder_name}/{username}_{time_str}.txt"
