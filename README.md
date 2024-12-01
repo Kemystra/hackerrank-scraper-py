@@ -9,7 +9,7 @@ To scrape stuff
     python main.py -t TOKEN -cn CONTEST_NAME -cid CHALLENGE_ID -u USERNAMES -o OUTPUT_FOLDER
     ```
     TOKEN can be a token string or txt file containing the token.
-    CHALLENGE_ID can be a comma-separated value (NO SPACE BEWTEEN THE IDs). Same with USERNAMES.
+    CHALLENGE_ID can be a comma-separated value. Same with USERNAMES.
 
 4. OR if you want to, you can just specify an option file.
 ```sh
