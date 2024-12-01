@@ -57,7 +57,7 @@ def scrape(args):
 def get_submission_ids(context, challenge_id_csv, is_accepted_only, usernames):
     ids = []
 
-    challenge_id_array = challenge_id_csv.strip().split(',')
+    challenge_id_array = [x.strip() for x in challenge_id_csv.strip().split(',')]
     username_array = usernames.strip().split(',')
 
     for challenge_id in challenge_id_array:
