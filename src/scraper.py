@@ -3,6 +3,7 @@ from requests.utils import cookiejar_from_dict
 import os
 import time
 import random
+import json
 from dataclasses import dataclass
 
 # Constants
@@ -20,17 +21,25 @@ class Context:
 def scrape(args):
     session = requests.session()
 
-    token_value = ""
-    if ".txt" in args.token:
-        f = open(args.token)
-        token_value = f.read()
-        token_value = token_value.strip()
+    challenge_ids = ""
+    contest_name = ""
+    usernames = ""
+    output_folder = ""
+    token = ""
+
+    if args.option_file:
+        f = open(args.option_file, 'r')
+        option_json = json.loads(f.read())
         f.close()
-    else:
-        token_value = args.token
+
+        contest_name = option_json['contest_name']
+        token = option_json['token']
+        challenge_ids = option_json['challenge_id']
+        usernames = option_json['usernames']
+        output_folder = option_json['output_folder']
 
     cookies = dict({
-        TOKEN_NAME: token_value
+        TOKEN_NAME: token
     })
 
     cookies = cookiejar_from_dict(cookies)
@@ -43,22 +52,19 @@ def scrape(args):
 
     session.headers.update(headers)
 
-    context = Context(session, args.contest_name)
-    submission_ids = get_submission_ids(context, args.challenge_id, args.is_accepted_only, args.usernames)
+    context = Context(session, contest_name)
+    submission_ids = get_submission_ids(context, challenge_ids, args.is_accepted_only, usernames)
     total_submissions = len(submission_ids)
     print(f"Scraped a total of {total_submissions} submission IDs.")
 
     for i in range(total_submissions):
-        progress_percent = ((i+1) / total_submissions) * 100
+        progress_percent = ((i + 1) / total_submissions) * 100
         print(f"{progress_percent:.4f}% - ", end='')
-        fetch_submissions_with_retries(context, submission_ids[i], args.delay, args.output_folder)
+        fetch_submissions_with_retries(context, submission_ids[i], args.delay, output_folder)
 
 
-def get_submission_ids(context, challenge_id_csv, is_accepted_only, usernames):
+def get_submission_ids(context, challenge_id_array, is_accepted_only, username_array):
     ids = []
-
-    challenge_id_array = [x.strip() for x in challenge_id_csv.strip().split(',')]
-    username_array = usernames.strip().split(',')
 
     for challenge_id in challenge_id_array:
         url = f'https://www.hackerrank.com/rest/contests/{context.contest_name}/judge_submissions/?offset=0&limit=1000000&challenge_id={challenge_id}'
