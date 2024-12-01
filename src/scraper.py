@@ -26,12 +26,8 @@ def scrape(args):
         option_json = json.loads(f.read())
         f.close()
 
-        args.contest_name = option_json['contest_name']
-        args.token = option_json['token']
-        args.challenge_ids = option_json['challenge_id']
-        args.usernames = option_json['usernames']
-        args.output_folder = option_json['output_folder']
-        args.delay = option_json['delay']
+        for (k, v) in option_json.items():
+            setattr(args, k, v)
 
     cookies = dict({
         TOKEN_NAME: args.token
