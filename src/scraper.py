@@ -21,25 +21,20 @@ class Context:
 def scrape(args):
     session = requests.session()
 
-    challenge_ids = ""
-    contest_name = ""
-    usernames = ""
-    output_folder = ""
-    token = ""
-
     if args.option_file:
         f = open(args.option_file, 'r')
         option_json = json.loads(f.read())
         f.close()
 
-        contest_name = option_json['contest_name']
-        token = option_json['token']
-        challenge_ids = option_json['challenge_id']
-        usernames = option_json['usernames']
-        output_folder = option_json['output_folder']
+        args.contest_name = option_json['contest_name']
+        args.token = option_json['token']
+        args.challenge_ids = option_json['challenge_id']
+        args.usernames = option_json['usernames']
+        args.output_folder = option_json['output_folder']
+        args.delay = option_json['delay']
 
     cookies = dict({
-        TOKEN_NAME: token
+        TOKEN_NAME: args.token
     })
 
     cookies = cookiejar_from_dict(cookies)
@@ -52,15 +47,15 @@ def scrape(args):
 
     session.headers.update(headers)
 
-    context = Context(session, contest_name)
-    submission_ids = get_submission_ids(context, challenge_ids, args.is_accepted_only, usernames)
+    context = Context(session, args.contest_name)
+    submission_ids = get_submission_ids(context, args.challenge_ids, args.is_accepted_only, args.usernames)
     total_submissions = len(submission_ids)
     print(f"Scraped a total of {total_submissions} submission IDs.")
 
     for i in range(total_submissions):
         progress_percent = ((i + 1) / total_submissions) * 100
         print(f"{progress_percent:.4f}% - ", end='')
-        fetch_submissions_with_retries(context, submission_ids[i], args.delay, output_folder)
+        fetch_submissions_with_retries(context, submission_ids[i], args.delay, args.output_folder)
 
 
 def get_submission_ids(context, challenge_id_array, is_accepted_only, username_array):
